@@ -21,14 +21,14 @@ dependencies = [
     "notebook>=7.4.0",
     "numpy>=2.2.0",
     "scipy>=1.15.0",
-    "torch>=2.14.0",
 ]
 
 [project.optional-dependencies]
 # Slycot speeds up python-control (Riccati, more accurate LTI numerics). Needs a Fortran compiler.
 slycot = ["slycot>=0.6.0"]
-# Install with: uv sync --extra cpu   (overrides the CUDA 13.2 torch index).
+# Install with: uv sync --extra gpu   (CUDA 13.2 wheels) or uv sync --extra cpu.
 cpu = ["torch>=2.14.0"]
+gpu = ["torch>=2.14.0"]
 
 [project.urls]
 Homepage = "https://github.com/ControlsMachineLearning"
@@ -45,14 +45,21 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
+# cpu and gpu extras are mutually exclusive so uv does not see both indexes at once.
+[tool.uv]
+package = false
+conflicts = [
+    [
+        { extra = "cpu" },
+        { extra = "gpu" },
+    ],
+]
+
 [tool.uv.sources]
 torch = [
     { index = "pytorch-cpu", extra = "cpu" },
-    { index = "pytorch-cu132" },
+    { index = "pytorch-cu132", extra = "gpu" },
 ]
-
-[tool.uv]
-package = false
 
 [tool.uv.extra-build-dependencies]
 slycot = ["numpy", "scikit-build-core"]
