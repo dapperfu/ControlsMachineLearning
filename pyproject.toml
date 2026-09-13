@@ -1,0 +1,58 @@
+[project]
+name = "controls-machine-learning"
+version = "0.1.0"
+description = "Jupyter-only classical controls and GPU signal-processing notebooks (python-control, SciPy, math, PyTorch/CUDA)."
+requires-python = ">=3.12,<3.15"
+license = { text = "MIT" }
+authors = [{ name = "ControlsMachineLearning" }]
+keywords = ["control", "signals", "pytorch", "cuda", "scipy", "jupyter"]
+classifiers = [
+    "Framework :: Jupyter",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "control>=0.10.2",
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.5",
+    "jupyterlab>=4.4.0",
+    "matplotlib>=3.10.0",
+    "notebook>=7.4.0",
+    "numpy>=2.2.0",
+    "scipy>=1.15.0",
+    "torch>=2.14.0",
+]
+
+[project.optional-dependencies]
+# Slycot speeds up python-control (Riccati, more accurate LTI numerics). Needs a Fortran compiler.
+slycot = ["slycot>=0.6.0"]
+# Install with: uv sync --extra cpu   (overrides the CUDA 13.2 torch index).
+cpu = ["torch>=2.14.0"]
+
+[project.urls]
+Homepage = "https://github.com/ControlsMachineLearning"
+
+# Newest published CUDA wheels as of PyTorch 2.14 (Sept 2026): CUDA 13.2.
+# pip/uv will pull torch from this index instead of the generic PyPI wheel.
+[[tool.uv.index]]
+name = "pytorch-cu132"
+url = "https://download.pytorch.org/whl/cu132"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu132" },
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.extra-build-dependencies]
+slycot = ["numpy", "scikit-build-core"]
